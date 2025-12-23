@@ -1,173 +1,211 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <title>GitHub Style বাংলা Reply Bot</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #f6f8fa;
-            display: flex;
-            justify-content: center;
-            padding: 50px;
-        }
-
-        .chat-container {
-            width: 600px;
-            background: #fff;
-            border: 1px solid #d1d5da;
-            border-radius: 6px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: #24292e;
-            color: #fff;
-            padding: 10px 15px;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .messages {
-            height: 400px;
-            overflow-y: auto;
-            padding: 15px;
-            background: #f6f8fa;
-        }
-
-        .message {
-            margin-bottom: 12px;
-            line-height: 1.5;
-            padding: 10px;
-            border-radius: 6px;
-            max-width: 80%;
-            word-wrap: break-word;
-        }
-
-        .user {
-            background: #dbedff;
-            align-self: flex-end;
-            text-align: right;
-            margin-left: auto;
-        }
-
-        .bot {
-            background: #e6ffed;
-            text-align: left;
-            margin-right: auto;
-        }
-
-        .input-container {
-            display: flex;
-            border-top: 1px solid #d1d5da;
-            padding: 10px;
-            background: #fff;
-        }
-
-        .input-container input {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #d1d5da;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .input-container button {
-            margin-left: 10px;
-            padding: 8px 12px;
-            background: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .input-container button:hover {
-            background: #218838;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Context-aware বাংলা Reply Bot</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f6f8fa;
+        display: flex;
+        justify-content: center;
+        padding: 50px;
+    }
+    .chat-container {
+        width: 600px;
+        background: #fff;
+        border: 1px solid #d1d5da;
+        border-radius: 6px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .header {
+        background: #24292e;
+        color: #fff;
+        padding: 10px 15px;
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .messages {
+        height: 400px;
+        overflow-y: auto;
+        padding: 15px;
+        background: #f6f8fa;
+        display: flex;
+        flex-direction: column;
+    }
+    .message {
+        margin-bottom: 12px;
+        line-height: 1.5;
+        padding: 10px;
+        border-radius: 6px;
+        max-width: 80%;
+        word-wrap: break-word;
+    }
+    .user {
+        background: #dbedff;
+        align-self: flex-end;
+        text-align: right;
+        margin-left: auto;
+    }
+    .bot {
+        background: #e6ffed;
+        text-align: left;
+        margin-right: auto;
+    }
+    .input-container {
+        display: flex;
+        border-top: 1px solid #d1d5da;
+        padding: 10px;
+        background: #fff;
+    }
+    .input-container input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #d1d5da;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    .input-container button {
+        margin-left: 10px;
+        padding: 8px 12px;
+        background: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .input-container button:hover {
+        background: #218838;
+    }
+</style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="header">GitHub Style বাংলা Reply Bot</div>
-        <div class="messages" id="messages"></div>
-        <div class="input-container">
-            <input type="text" id="userInput" placeholder="আপনার মেসেজ লিখুন...">
-            <button onclick="sendMessage()">Send</button>
-        </div>
+
+<div class="chat-container">
+    <div class="header">Context-aware বাংলা Reply Bot</div>
+    <div class="messages" id="messages"></div>
+    <div class="input-container">
+        <input type="text" id="userInput" placeholder="আপনার মেসেজ লিখুন...">
+        <button onclick="sendMessage()">Send</button>
     </div>
+</div>
 
-    <script>
-        // ১০০টি মানবসদৃশ বাংলা reply
-        const banglaReplies = [
-            "হ্যালো! কেমন আছেন?", "আমি ভালো আছি, আপনাকে কেমন লাগছে?", "ধন্যবাদ জানাই 😊",
-            "আপনার কথা শুনে ভালো লাগলো", "ঠিক আছে, আমি দেখব", "অবশ্যই, এটা করা সম্ভব",
-            "দুঃখিত, আমি বুঝতে পারিনি", "আবার একটু স্পষ্ট করে বলবেন?", "আমি সাহায্য করতে পারি কি?",
-            "হুম, সেটা ঠিক আছে", "আপনি ভালো করেছেন", "শুভ সকাল! ☀️", "শুভ বিকেল! 🌸",
-            "শুভ রাত্রী! 🌙", "আমার মনে হয় এটা কাজ করবে", "একদম ঠিক বলেছেন", "হা, এটা সম্ভব",
-            "আমি এটাতে মন দিচ্ছি", "চিন্তা করবেন না", "অবশ্যই সম্ভব", "আমি সাথে আছি",
-            "ধৈর্য ধরুন, সব ঠিক হয়ে যাবে", "বাহ, দারুন আইডিয়া!", "সত্যিই? খুব ভালো লাগলো শুনে",
-            "আপনি ঠিক বলেছেন", "আমি সেটি মনে রাখব", "চেষ্টা করুন, নিশ্চয় সফল হবেন",
-            "দয়া করে আবার বলুন", "আমি একটু ব্যস্ত আছি, পরে বলবো", "ঠিক আছে, চলুন শুরু করি",
-            "আমি এ বিষয়ে জানি", "অবশ্যই, আমি সাহায্য করবো", "আমার মনে হয় এটা ঠিক নয়",
-            "হুম, ঠিক আছে", "দয়া করে একটু সময় দিন", "সুন্দর! খুব ভালো লাগলো", "আমি এতে সম্মত",
-            "চমৎকার! 👏", "সেটা খুব সহায়ক", "আমি মনে করি এটা গুরুত্বপূর্ণ",
-            "দুঃখিত, আমি কিছু বুঝতে পারিনি", "আপনার পরামর্শ মূল্যবান", "ঠিক আছে, আমি সেটি মনে রাখব",
-            "হুম, একমত", "চেষ্টা করে দেখুন", "আপনি যা বললেন তা সঠিক", "আমি খুশি হলাম আপনার জন্য",
-            "আমি সাথে আছি, চিন্তা করবেন না", "ধন্যবাদ জানাই সাহায্যের জন্য", "এটা সত্যিই চমৎকার",
-            "হুম, আমি একমত", "দয়া করে আরও ব্যাখ্যা করুন", "আপনি খুব ভালো করেছেন",
-            "হা, এটা সম্ভবত কাজ করবে", "চিন্তা করবেন না, সব ঠিক হয়ে যাবে", "আপনার মতামত গুরুত্বপূর্ণ",
-            "অবশ্যই, আমি এটাতে মন দেব", "দারুন! এটা খুব ভালো লাগলো", "আমি চেষ্টা করবো সাহায্য করতে",
-            "হুম, ঠিক আছে, চলুন শুরু করি", "ধন্যবাদ আপনার সহযোগিতার জন্য", "আপনার পরামর্শ সত্যিই সহায়ক",
-            "আমি একমত, এটা গুরুত্বপূর্ণ", "দুঃখিত, আমার জানা ছিল না", "আমি এটা নোট করব", "চমৎকার আইডিয়া!",
-            "হুম, এটা সত্যিই গুরুত্বপূর্ণ", "আপনি চমৎকার কাজ করেছেন", "আমি এটাতে রাজি", "ঠিক আছে, চলুন করি",
-            "ধন্যবাদ আপনার ধৈর্যের জন্য", "আপনার কথায় আমি খুশি হলাম", "হুম, এটা কাজ করতে পারে",
-            "সেটা সত্যিই সহায়ক", "দয়া করে আরও বিস্তারিত বলুন", "আপনার পরামর্শ আমি মনে রাখব",
-            "আমি চেষ্টা করব সাহায্য করতে", "হা, একদম সম্ভব", "ধন্যবাদ, খুব উপকারী ছিল",
-            "আপনি ঠিক বলেছেন, এটি গুরুত্বপূর্ণ", "চমৎকার! আমি সম্মত", "হুম, আমি এটাকে মনে রাখব",
-            "আপনার কথা সত্যিই মূল্যবান", "দুঃখিত, আমি কিছু বুঝতে পারিনি", "ঠিক আছে, আমি চেষ্টা করব",
-            "আপনি খুব ভালো করেছেন, ধন্যবাদ", "আমি সাথে আছি, চিন্তা করবেন না", "হুম, এটা সম্ভবত কাজ করবে",
-            "সুন্দর! খুব ভালো লাগলো", "ধন্যবাদ, আপনার পরামর্শ ভালো লাগলো", "ঠিক আছে, চলুন শুরু করি",
-            "হা, আমি একমত", "আপনি সত্যিই চমৎকার", "আমি এটাতে মন দেব", "দুঃখিত, আমি ভুল করেছি",
-            "আপনি যা বললেন তা সত্যি", "হুম, সব ঠিক আছে", "চেষ্টা করুন, আপনি পারবেন", "ধন্যবাদ! এটা অনেক সাহায্য করবে",
-            "ঠিক আছে, আমি নোট করব", "আপনি খুব সহায়ক, ধন্যবাদ", "হুম, চলুন করি"
-        ];
+<script>
+const messagesContainer = document.getElementById('messages');
+const input = document.getElementById('userInput');
 
-        const messagesContainer = document.getElementById('messages');
-        const input = document.getElementById('userInput');
+// Conversation memory
+let memory = {
+    username: null
+};
 
-        function addMessage(sender, text) {
-            const div = document.createElement('div');
-            div.className = 'message ' + sender;
-            div.innerText = text;
-            messagesContainer.appendChild(div);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+// Predefined templates
+const replies = {
+    greeting: [
+        "হ্যালো! কেমন আছেন?",
+        "শুভ সকাল! আশা করি ভালো আছেন",
+        "হাই! কেমন চলছে?"
+    ],
+    feeling: [
+        "আমি ভালো আছি, আপনি কেমন আছেন?",
+        "ধন্যবাদ, আপনার খোঁজ নেওয়ার জন্য",
+        "আমি ঠিক আছি 😊"
+    ],
+    name: [
+        "আমার নাম বাংলা রিপ্লাই বট 🤖",
+        "আপনি চাইলে আমাকে কোনো নাম দিতে পারেন",
+        "আমি আপনার বন্ধু হিসেবে আছি"
+    ],
+    thanks: [
+        "আপনাকেও ধন্যবাদ 😊",
+        "সর্বদা সাহায্য করতে প্রস্তুত!",
+        "খুব ভালো লাগলো সাহায্য করতে পারায়"
+    ],
+    bye: [
+        "আবার কথা হবে, ভালো থাকবেন 🌸",
+        "বিদায়! সুস্থ থাকুন",
+        "চলুন, আবার দেখা হবে"
+    ],
+    default: [
+        "দুঃখিত, আমি বুঝতে পারিনি 😅",
+        "আবার একটু সহজ করে বলবেন?",
+        "আমি সাহায্য করতে চাই, আরেকবার বলুন"
+    ]
+};
+
+// Add message to chat
+function addMessage(sender, text) {
+    const div = document.createElement('div');
+    div.className = 'message ' + sender;
+    div.innerText = text;
+    messagesContainer.appendChild(div);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Context-aware reply logic
+function getReply(msg) {
+    msg = msg.toLowerCase();
+
+    // Capture user name
+    if(msg.includes("আমার নাম")) {
+        const nameMatch = msg.match(/আমার নাম (\w+)/);
+        if(nameMatch) {
+            memory.username = nameMatch[1];
+            return `সুন্দর! আমি মনে রাখব যে আপনার নাম ${memory.username}`;
         }
+    }
 
-        function getRandomReply() {
-            const index = Math.floor(Math.random() * banglaReplies.length);
-            return banglaReplies[index];
+    if(msg.includes("হ্যালো") || msg.includes("হাই") || msg.includes("শুভ")) {
+        return randomChoice(replies.greeting);
+    }
+    if(msg.includes("কেমন")) {
+        if(memory.username) {
+            return `আমি ভালো আছি, ${memory.username}! আপনি কেমন আছেন?`;
+        } else {
+            return randomChoice(replies.feeling);
         }
+    }
+    if(msg.includes("নাম কি")) {
+        return randomChoice(replies.name);
+    }
+    if(msg.includes("ধন্যবাদ")) {
+        return randomChoice(replies.thanks);
+    }
+    if(msg.includes("বিদায়") || msg.includes("bye")) {
+        return randomChoice(replies.bye);
+    }
 
-        function sendMessage() {
-            const msg = input.value.trim();
-            if (!msg) return;
+    // Default fallback
+    return randomChoice(replies.default);
+}
 
-            addMessage('user', msg);
-            input.value = '';
+// Pick random from array
+function randomChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
 
-            setTimeout(() => {
-                const reply = getRandomReply();
-                addMessage('bot', reply);
-            }, 700); // delay for realism
-        }
+// Send message
+function sendMessage() {
+    const msg = input.value.trim();
+    if(!msg) return;
+    addMessage('user', msg);
+    input.value = '';
 
-        // Send message on Enter key
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendMessage();
-        });
-    </script>
+    // Typing delay simulation
+    addMessage('bot', 'typing...');
+    setTimeout(() => {
+        messagesContainer.removeChild(messagesContainer.lastChild);
+        addMessage('bot', getReply(msg));
+    }, 800);
+}
+
+// Send message on Enter key
+input.addEventListener('keypress', function(e) {
+    if(e.key === 'Enter') sendMessage();
+});
+</script>
+
 </body>
-  </html>
+</html>
